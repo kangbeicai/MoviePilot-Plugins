@@ -131,7 +131,7 @@ class ANiStrm(_PluginBase):
 
     @retry(Exception, tries=3, logger=logger, ret=[])
     def get_current_season_list(self) -> List:
-        url = f'https://aniopen.an-i.workers.dev/{self.__get_ani_season()}/'
+        url = f'https://aniopen.kangbeicai.top/{self.__get_ani_season()}/'
 
         rep = RequestUtils(ua=settings.USER_AGENT if settings.USER_AGENT else None,
                            proxies=settings.PROXY if settings.PROXY else None).post(url=url)
@@ -157,13 +157,13 @@ class ANiStrm(_PluginBase):
             # 链接
             link = DomUtils.tag_value(item, "link", default="")
             rss_info['title'] = title
-            rss_info['link'] = link.replace("resources.ani.rip", "aniopen.an-i.workers.dev")
+            rss_info['link'] = link.replace("resources.ani.rip", "aniopen.kangbeicai.top")
             ret_array.append(rss_info)
         return ret_array
 
     def __touch_strm_file(self, file_name, file_url: str = None) -> bool:
         if not file_url:
-            src_url = f'https://aniopen.an-i.workers.dev/{self._date}/{file_name}?d=true'
+            src_url = f'https://aniopen.kangbeicai.top/{self._date}/{file_name}?d=true'
         else:
             src_url = file_url
         file_path = f'{self._storageplace}/{file_name}.strm'
