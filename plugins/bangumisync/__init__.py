@@ -1,10 +1,11 @@
 from typing import Tuple, List, Dict, Any
 from app.core.event import eventmanager, Event
 from app.core.config import settings
+from app.core.metainfo import MetaInfo
 from app.log import logger
 from app.plugins import _PluginBase
-from app.schemas import WebhookEventInfo
-from app.schemas.types import EventType
+from app.schemas import WebhookEventInfo, MediaInfo
+from app.schemas.types import EventType, MediaType
 from app.utils.http import RequestUtils
 from cachetools import cached, TTLCache
 
@@ -17,7 +18,7 @@ class BangumiSync(_PluginBase):
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/honue/MoviePilot-Plugins/main/icons/bangumi.jpg"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     # 插件作者
     plugin_author = "honue"
     # 作者主页
@@ -62,6 +63,9 @@ class BangumiSync(_PluginBase):
             """
             # 标题
             title = event_info.item_name.split(' ')[0]
+            tmdb_id = event_info.tmdb_id
+            meta = MetaInfo(title)
+            mediainfo: MediaInfo = self.chain.recognize_media(meta=meta, tmdbid=tmdb_id, mtype=MediaType.TV)
             # 季 集
             season_id, episode_id = map(int, [event_info.season_id, event_info.episode_id])
             logger.info(f"开始播放 {title} 第{season_id}季 第{episode_id}集")
@@ -69,7 +73,7 @@ class BangumiSync(_PluginBase):
             # 先只同步在看状态吧...
             # if episode_id > 1:
             #     return
-            subject_id = self.get_subjectid_by_title(title, season_id)
+            subject_id = self.get_subjectid_by_title(mediainfo.original_title, season_id)
             self.sync_watching_status(subject_id)
 
     @staticmethod
